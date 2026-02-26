@@ -44,6 +44,17 @@ export async function apiLogin(email: string, password: string) {
 }
 
 // Files
+export async function apiUpload(formData: FormData) {
+  const token = getToken();
+  const headers: HeadersInit = token ? { Authorization: `Bearer ${token}` } : {};
+  const res = await fetch(`${API_URL}/files/upload`, {
+    method: 'POST',
+    headers,
+    body: formData,
+  });
+  return handleResponse(res);
+}
+
 export async function apiGetMyFiles(tag?: string) {
   const url = tag
     ? `${API_URL}/files/my?tag=${encodeURIComponent(tag)}`
