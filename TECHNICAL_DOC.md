@@ -2,6 +2,8 @@
 
 ## 1. Architecture de l'application
 
+> Diagrammes Mermaid complets (importables dans draw.io) : **[docs/ARCHITECTURE_DIAGRAM.md](./docs/ARCHITECTURE_DIAGRAM.md)**
+
 ```
 ┌─────────────────────────────────────────────────────────────────┐
 │                         NAVIGATEUR                              │
@@ -75,6 +77,8 @@
 
 ## 3. Modèle de données
 
+> Diagramme ER Mermaid complet (importable dans draw.io) : **[docs/MCD_DIAGRAM.md](./docs/MCD_DIAGRAM.md)**
+
 ### Entités
 
 **User**
@@ -124,7 +128,7 @@ file    File   @relation(fields: [fileId], references: [id], onDelete: Cascade)
 
 ## 4. Documentation d'API
 
-Le contrat d'interface complet est dans `/Users/demdoum/P3/docs/API_CONTRACT.md`.
+> Diagrammes Mermaid complets (séquences, endpoints, DTOs) : **[docs/API_DIAGRAM.md](./docs/API_DIAGRAM.md)**
 
 ### Endpoints principaux
 
