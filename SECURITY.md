@@ -73,13 +73,48 @@ Seule l'origine frontend autorisée.
 
 ---
 
-## Audit rapide
+## Résultats du scan de sécurité — npm audit
+
+Exécuté le 2026-02-27.
+
+### Frontend (`web/`)
+
+```
+found 0 vulnerabilities
+```
+
+**Statut : aucune vulnérabilité.** Le frontend utilise uniquement React, Vite, Tailwind et React Router — toutes à jour.
+
+### Backend (`api/`)
+
+```
+14 moderate severity vulnerabilities
+```
+
+**Détail des packages affectés :**
+
+| Package | Sévérité | Via | Type de dépendance |
+|---|---|---|---|
+| `@nestjs/cli` | moderate | `@angular-devkit/*`, `ajv` | **devDependency** |
+| `prisma` (CLI) | moderate | `@prisma/dev`, `hono`, `lodash` | **devDependency** |
+| `ajv` | moderate | ReDoS avec option `$data` | **devDependency** (transitive) |
+| `hono` | moderate | XSS, cache deception, IP spoofing | **devDependency** (via `@prisma/dev`) |
+| `lodash` | moderate | Prototype Pollution | **devDependency** (transitive) |
+
+### Analyse et décisions
+
+**Toutes les vulnérabilités sont dans des `devDependencies`** (outils CLI : `@nestjs/cli` et `prisma` CLI, utilisés uniquement pendant le développement). Le runtime de l'application (les packages chargés au démarrage de l'API) n'est **pas affecté**.
+
+| Vulnérabilité | Décision | Raison |
+|---|---|---|
+| `hono` XSS / cache / IP | **Acceptée** | Dans `@prisma/dev` (devDep), jamais exécuté en production |
+| `lodash` prototype pollution | **Acceptée** | Dans CLI tools (devDep), non exposé aux utilisateurs |
+| `ajv` ReDoS | **Acceptée** | Dans `@nestjs/cli` (devDep), non dans le serveur |
+| Correctif `--force` | **Refusé** | Changerait des versions majeures, risque de casse |
+
+**Commande pour reproduire :**
 
 ```bash
-# Vérifier les dépendances vulnérables
 cd api && npm audit
 cd web && npm audit
-
-# Vérifier les fichiers uploadés
-ls api/uploads/
 ```

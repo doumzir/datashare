@@ -96,7 +96,55 @@ psql -U postgres datashare -c "SELECT id, originalName, expiresAt FROM \"File\" 
 | Automatique (minuit) | Purge des fichiers expirés (SchedulerService) |
 | Hebdomadaire | `npm audit` — vérifier les vulnérabilités |
 | Mensuel | `npm update` — mettre à jour les dépendances mineures |
+| Trimestriel | Revue des dépendances majeures (voir ci-dessous) |
 | À chaque déploiement | `npx prisma migrate deploy` |
+
+---
+
+## Mise à jour des dépendances
+
+### Procédure générale
+
+```bash
+# 1. Vérifier les mises à jour disponibles
+cd api && npx npm-check-updates
+cd web && npx npm-check-updates
+
+# 2. Mettre à jour les versions mineures/patch (sans risque)
+cd api && npm update
+cd web && npm update
+
+# 3. Pour les versions majeures — faire une branche dédiée
+git checkout -b chore/update-deps-<date>
+# Mettre à jour, tester, PR
+```
+
+### Fréquence recommandée
+
+| Type de mise à jour | Fréquence | Risque |
+|---|---|---|
+| **Patch** (ex: 1.2.3 → 1.2.4) | Automatique / hebdomadaire | Faible — correctifs de bugs |
+| **Minor** (ex: 1.2.x → 1.3.0) | Mensuel | Faible — rétrocompatible |
+| **Major** (ex: 1.x → 2.0) | Trimestriel / à la demande | Élevé — breaking changes possibles |
+
+### Dépendances à surveiller en priorité
+
+| Package | Raison | Risque mise à jour |
+|---|---|---|
+| `prisma` + `@prisma/client` | Changements d'API fréquents (v7 a cassé v6) | Élevé — tester migrations |
+| `@nestjs/*` | Framework principal backend | Moyen — suivre changelog |
+| `react` + `react-router` | Framework principal frontend | Moyen — suivre changelog |
+| `bcrypt` | Sécurité critique | Faible — stable |
+| `jsonwebtoken` (via `@nestjs/jwt`) | Sécurité critique | Faible — stable |
+
+### Risques identifiés
+
+| Risque | Mitigation |
+|---|---|
+| Migration Prisma cassante (ex: v6→v7) | Tester sur branche dédiée, vérifier `prisma.config.ts` |
+| Breaking change NestJS | Lire le changelog avant de mettre à jour |
+| Vulnérabilité dans `devDependencies` | Acceptée si non exploitable en runtime (voir SECURITY.md) |
+| `package-lock.json` divergent | Toujours committer le lockfile avec les mises à jour |
 
 ---
 
